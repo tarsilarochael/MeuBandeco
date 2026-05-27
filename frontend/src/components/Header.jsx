@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   const menuItems = [
     { path: '/home', label: '🏠 Início' },
@@ -42,7 +44,11 @@ const Header = () => {
 
           {/* Ícone de Logout */}
           <button
-            onClick={() => navigate('/')}
+            type="button"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
             title="Sair"
           >

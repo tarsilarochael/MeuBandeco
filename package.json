@@ -1,23 +1,23 @@
 {
-  "name": "meu-bandeco",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.30.3"
+    "recharts": "^3.7.0"
   },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.0",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "vite": "^5.2.0"
-  }
+  "scripts": {
+    "dev": "vite --mode development",
+    "build": "vite build --mode production"
+  },
+  "name": "sistema",
+  "version": "1.0.0",
+  "description": "Template para desenvolvimento de novos projetos",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emarchettisilva/template-ReactVite.git"
+  },
+  "author": "Edson Marchetti",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emarchettisilva/template-ReactVite/issues"
+  },
+  "homepage": "https://github.com/emarchettisilva/template-ReactVite#readme"
 }

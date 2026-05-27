@@ -1,14 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Dados mockados do usuário
   const usuario = {
-    nome: 'João Silva',
-    matricula: '2020123456',
+    nome: user?.nomUsuario || 'Usuário',
+    matricula: user?.codUsuarioCPF || '—',
     saldo: 45.60,
     refeicoes: 8,
     ultimaRefeicao: '12/01/2024 - 12:30'
