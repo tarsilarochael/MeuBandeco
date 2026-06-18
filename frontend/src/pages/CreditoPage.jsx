@@ -17,11 +17,11 @@ const CreditoPage = () => {
   const [buscandoDestinatario, setBuscandoDestinatario] = useState(false);
   const [erroDestinatario, setErroDestinatario] = useState('');
 
-  // Estado para o Histórico de Transações
+  // Estado para o Histórico de Transações com saldoAnterior adicionado
   const [historico, setHistorico] = useState([
-    { id: 1, tipo: 'Recarga', valor: 20.00, data: '12/05/2026' },
-    { id: 2, tipo: 'Transferência Enviada', valor: 3.90, data: '10/05/2026' },
-    { id: 3, tipo: 'Refeição - RU', valor: 3.90, data: '10/05/2026' },
+    { id: 1, tipo: 'Recarga', valor: 20.00, data: '12/05/2026', saldoAnterior: 25.60 },
+    { id: 2, tipo: 'Transferência Enviada', valor: 3.90, data: '10/05/2026', saldoAnterior: 29.50 },
+    { id: 3, tipo: 'Refeição - RU', valor: 3.90, data: '10/05/2026', saldoAnterior: 33.40 },
   ]);
 
   const valoresRecarga = [10, 20, 50];
@@ -93,6 +93,7 @@ const CreditoPage = () => {
         tipo: 'Recarga',
         valor: valorRecarga,
         data: new Date().toLocaleDateString('pt-BR'),
+        saldoAnterior: saldoAtual // Regista o saldo atual como saldo anterior da transação
       };
       setHistorico([novaTransacao, ...historico]);
       setMostrarConfirmacao(true);
@@ -115,6 +116,7 @@ const CreditoPage = () => {
       tipo: `Transferência para ${destinatario.nomUsuario}`,
       valor: parseFloat(valorTransferencia),
       data: new Date().toLocaleDateString('pt-BR'),
+      saldoAnterior: saldoAtual // Regista o saldo atual como saldo anterior da transação
     };
 
     setHistorico([novaTransferencia, ...historico]);
@@ -296,6 +298,7 @@ const CreditoPage = () => {
           </div>
         )}
 
+        {/* Modal de Histórico */}
         {mostrarHistorico && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[85vh] overflow-hidden flex flex-col">
@@ -316,6 +319,7 @@ const CreditoPage = () => {
                     <tr className="border-b border-gray-100">
                       <th className="py-3 px-2 text-xs font-bold text-gray-400 uppercase">Data</th>
                       <th className="py-3 px-2 text-xs font-bold text-gray-400 uppercase">Tipo</th>
+                      <th className="py-3 px-2 text-xs font-bold text-gray-400 uppercase text-right">Saldo Ant.</th>
                       <th className="py-3 px-2 text-xs font-bold text-gray-400 uppercase text-right">Valor</th>
                     </tr>
                   </thead>
@@ -325,6 +329,9 @@ const CreditoPage = () => {
                         <td className="py-4 px-2 text-sm text-gray-600">{item.data}</td>
                         <td className="py-4 px-2">
                           <p className="text-sm font-semibold text-gray-800">{item.tipo}</p>
+                        </td>
+                        <td className="py-4 px-2 text-sm text-gray-500 text-right">
+                          R$ {item.saldoAnterior ? item.saldoAnterior.toFixed(2) : '0.00'}
                         </td>
                         <td className={`py-4 px-2 text-sm font-bold text-right ${item.tipo === 'Recarga' ? 'text-green-600' : 'text-red-500'}`}>
                           {item.tipo === 'Recarga' ? '+' : '-'} R$ {item.valor.toFixed(2)}

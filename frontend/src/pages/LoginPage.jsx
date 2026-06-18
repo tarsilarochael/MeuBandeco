@@ -20,6 +20,18 @@ const LoginPage = () => {
 
   const isBloqueado = bloqueadoAte && new Date() < bloqueadoAte;
 
+  // Estado que controla se o modal de escolha da Nutricionista aparece ou não
+  const [mostrarSelecao, setMostrarSelecao] = useState(false);
+
+  // Função que direciona a nutricionista dependendo do que ela escolher no modal
+  const handlePerfilSelecionado = (perfil) => {
+    if (perfil === 'nutri') {
+      navigate('/nutricionista'); // Mantendo a rota que já estava no seu código
+    } else {
+      navigate('/home'); 
+    }
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -47,8 +59,9 @@ const LoginPage = () => {
       const usuario = await login(codUsuarioCPF, senha);
       setTentativas(0);
 
+      // Aqui está a mágica! Se for nutricionista, abre o modal em vez de ir direto
       if (usuario.idPapel === PAPEL_NUTRICIONISTA) {
-        navigate('/nutricionista');
+        setMostrarSelecao(true);
       } else {
         navigate('/home');
       }
@@ -202,6 +215,47 @@ const LoginPage = () => {
         @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(2px); } }
         .animate-shake { animation: shake 0.5s ease-in-out; }
       `}</style>
+
+      {/* MODAL DE SELEÇÃO RENDERIZADO POR CIMA SE FOR NUTRICIONISTA */}
+      {mostrarSelecao && (
+        <SelecaoPerfilModal onSelect={handlePerfilSelecionado} />
+      )}
+    </div>
+  );
+};
+
+// Componente do Modal no finalzinho do arquivo
+const SelecaoPerfilModal = ({ onSelect }) => {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+      <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+        <h2 className="text-2xl font-bold text-blue-900 mb-2">Bem-vinda de volta! 👋</h2>
+        <p className="text-gray-600 mb-6">Como você deseja acessar o sistema hoje?</p>
+        
+        <div className="space-y-4">
+          <button 
+            onClick={() => onSelect('nutri')}
+            className="w-full flex items-center p-4 border-2 border-green-600 rounded-xl hover:bg-green-50 transition-all text-left group"
+          >
+            <span className="text-3xl mr-4 group-hover:scale-110 transition-transform">👩‍⚕️</span>
+            <div>
+              <h3 className="font-bold text-gray-800">Painel da Nutricionista</h3>
+              <p className="text-sm text-gray-500">Gerenciar cardápio e responder avaliações</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => onSelect('aluno')}
+            className="w-full flex items-center p-4 border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-all text-left group"
+          >
+            <span className="text-3xl mr-4 group-hover:scale-110 transition-transform">🍽️</span>
+            <div>
+              <h3 className="font-bold text-gray-800">Área do Aluno</h3>
+              <p className="text-sm text-gray-500">Ver cardápio, adicionar saldo e avaliar</p>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

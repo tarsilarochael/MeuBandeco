@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 
 const PainelNutriPage = () => {
-  const [abaAtiva, setAbaAtiva] = useState('feedbacks'); // Mudei para iniciar em feedbacks para testarmos o dash
+  const [abaAtiva, setAbaAtiva] = useState('cardapio'); // Voltei para o cardápio por padrão
+
+  // NOVO: Estado para controlar se é almoço ou jantar
+  const [tipoRefeicao, setTipoRefeicao] = useState('almoco'); 
 
   // Mock de dados para os feedbacks
   const [feedbacks, setFeedbacks] = useState([
@@ -89,8 +92,78 @@ const PainelNutriPage = () => {
         {/* Aba: Cardápio Base */}
         {abaAtiva === 'cardapio' && (
           <div className="bg-white rounded-2xl shadow-md p-6 animate-fade-in">
-            <h2 className="text-xl font-bold text-blue-900 mb-6">Definir Cardápio do Dia</h2>
-            {/* ... restante do seu código do cardápio ... */}
+            <h2 className="text-xl font-bold text-blue-900 mb-4">Definir Cardápio do Dia</h2>
+            
+            {/* RADIO BUTTONS: Almoço ou Jantar */}
+            <div className="flex gap-6 mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200 w-fit">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="tipoRefeicao" 
+                  value="almoco" 
+                  checked={tipoRefeicao === 'almoco'} 
+                  onChange={(e) => setTipoRefeicao(e.target.value)}
+                  className="w-5 h-5 text-blue-900 focus:ring-blue-900 cursor-pointer"
+                />
+                <span className={`font-bold text-lg ${tipoRefeicao === 'almoco' ? 'text-blue-900' : 'text-gray-500 group-hover:text-gray-700'}`}>
+                  ☀️ Almoço
+                </span>
+              </label>
+              
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="tipoRefeicao" 
+                  value="jantar" 
+                  checked={tipoRefeicao === 'jantar'} 
+                  onChange={(e) => setTipoRefeicao(e.target.value)}
+                  className="w-5 h-5 text-blue-900 focus:ring-blue-900 cursor-pointer"
+                />
+                <span className={`font-bold text-lg ${tipoRefeicao === 'jantar' ? 'text-blue-900' : 'text-gray-500 group-hover:text-gray-700'}`}>
+                  🌙 Jantar
+                </span>
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Prato Principal</label>
+                  <input type="text" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800 bg-gray-50" placeholder="Ex: Frango Assado" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Opção Vegetariana</label>
+                  <input type="text" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800 bg-gray-50" placeholder="Ex: Estrogonofe de Soja" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Guarnição</label>
+                  <input type="text" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800 bg-gray-50" placeholder="Ex: Purê de Batatas" />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Salada</label>
+                  <input type="text" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800 bg-gray-50" placeholder="Ex: Mix de Folhas Verdes" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Sobremesa</label>
+                  <input type="text" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800 bg-gray-50" placeholder="Ex: Fruta da Estação" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Replicar para Unidades:</label>
+                  <select className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800 bg-gray-50">
+                    <option>Todas as Unidades</option>
+                    <option>Apenas Campus I e II (BH)</option>
+                    <option>Apenas Campus Contagem</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <button className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+              💾 Salvar Cardápio ({tipoRefeicao === 'almoco' ? 'Almoço' : 'Jantar'})
+            </button>
           </div>
         )}
 
@@ -98,11 +171,18 @@ const PainelNutriPage = () => {
         {abaAtiva === 'comunicados' && (
           <div className="bg-white rounded-2xl shadow-md p-6 animate-fade-in">
             <h2 className="text-xl font-bold text-blue-900 mb-6">Novo Comunicado</h2>
-            {/* ... restante do seu código de comunicados ... */}
+            <textarea 
+              rows="4" 
+              className="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-800 bg-gray-50 mb-4"
+              placeholder="Digite o aviso para os alunos (ex: Mudança no horário de funcionamento neste feriado)..."
+            ></textarea>
+            <button className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+              📢 Disparar Notificação
+            </button>
           </div>
         )}
 
-        {/* Aba: Feedbacks (Com o novo Dashboard!) */}
+        {/* Aba: Feedbacks */}
         {abaAtiva === 'feedbacks' && (
           <div className="space-y-6 animate-fade-in">
             
