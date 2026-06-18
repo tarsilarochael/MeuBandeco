@@ -15,16 +15,6 @@ const HomePage = () => {
     ultimaRefeicao: '12/01/2024 - 12:30'
   };
 
-  // Dados mockados do tráfego do refeitório (Req09)
-  const refeitorio = {
-    ocupacao: 85, // porcentagem de lotação da catraca
-    status: 'Lotação Alta', // Pode ser: Vazio, Moderado, Lotação Alta
-    corTexto: 'text-red-600',
-    corBarra: 'bg-red-500',
-    tempoEspera: '~ 20 min',
-    atualizadoAs: '12:05'
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -37,27 +27,6 @@ const HomePage = () => {
             <p className="text-gray-600 mt-1">Matrícula: {usuario.matricula}</p>
           </div>
           <div className="text-4xl">👋</div>
-        </div>
-
-        {/* Status do Refeitório (Req09) */}
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
-          <div className="flex justify-between items-end mb-2">
-            <div>
-              <h2 className="text-lg font-bold text-gray-800">📊 Status do Refeitório</h2>
-              <p className="text-sm text-gray-500">Baseado nas catracas • Atualizado às {refeitorio.atualizadoAs}</p>
-            </div>
-            <div className={`text-right ${refeitorio.corTexto}`}>
-              <p className="font-bold text-xl">{refeitorio.status}</p>
-              <p className="text-sm font-semibold">Fila: {refeitorio.tempoEspera}</p>
-            </div>
-          </div>
-          {/* Barra de Progresso Visual */}
-          <div className="w-full bg-gray-200 rounded-full h-4 mt-4 overflow-hidden">
-            <div 
-              className={`${refeitorio.corBarra} h-4 rounded-full transition-all duration-1000`} 
-              style={{ width: `${refeitorio.ocupacao}%` }}
-            ></div>
-          </div>
         </div>
 
         {/* Cards de Informação */}

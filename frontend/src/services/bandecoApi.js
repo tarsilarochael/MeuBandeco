@@ -56,6 +56,40 @@ export async function fetchSessaoComToken(token) {
   };
 }
 
+/** Busca nome do usuário pelo CPF/matrícula (rota pública loginAcesso). */
+export async function buscarNomePorIdentificador(identificador) {
+  const codUsuarioCPF = String(identificador).replace(/\D/g, '');
+  if (codUsuarioCPF.length !== 11) {
+    return null;
+  }
+
+  const res = await fetch(`${API_BASE}/loginAcesso/${codUsuarioCPF}`);
+  const data = await res.json().catch(() => ({}));
+
+  if (data.nomUsuario) {
+    return { codUsuarioCPF, nomUsuario: data.nomUsuario };
+  }
+
+  return null;
+}
+
+function dataHojeIso() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Verifica se o aluno passou a carteirinha no refeitório hoje. */
+export async function consultarPassagemCarteirinhaHoje(codUsuarioCPF) {
+  if (!codUsuarioCPF) return false;
+
+  const chave = `meu-bandeco-passagem-${codUsuarioCPF}-${dataHojeIso()}`;
+  if (localStorage.getItem(chave) === '1') return true;
+
+  // Demo: aluno de exemplo já registrou passagem hoje
+  if (codUsuarioCPF === '22222222222') return true;
+
+  return false;
+}
+
 export async function loginPorCpfESenha(codUsuarioCPF, desSenha) {
   const res = await fetch(`${API_BASE}/obterToken`, {
     method: 'POST',

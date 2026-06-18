@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { useAuth } from '../context/AuthContext.jsx';
+import { consultarPassagemCarteirinhaHoje } from '../services/bandecoApi';
+
+const DIAS_SEMANA = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+const DIAS_UTEIS = ['segunda', 'terca', 'quarta', 'quinta', 'sexta'];
+
+function obterDiaCardapioHoje() {
+  const chave = DIAS_SEMANA[new Date().getDay()];
+  return DIAS_UTEIS.includes(chave) ? chave : null;
+}
 
 const CardapioPage = () => {
-  const [diaSelecionado, setDiaSelecionado] = useState('segunda');
+  const { user } = useAuth();
+  const diaHoje = obterDiaCardapioHoje();
+  const [diaSelecionado, setDiaSelecionado] = useState(diaHoje ?? 'segunda');
   const [unidade, setUnidade] = useState('Campus I - Nova Suíça');
+  const [passouCarteirinhaHoje, setPassouCarteirinhaHoje] = useState(false);
+  const [carregandoPassagem, setCarregandoPassagem] = useState(true);
   
   // Estados para o Feedback (Req08)
   const [nota, setNota] = useState(0);
@@ -43,20 +57,91 @@ const CardapioPage = () => {
         suco: 'Acerola'
       }
     },
-    // ... outros dias da semana
+    quarta: {
+      almoco: {
+        principal: 'Arroz, Feijão, Frango Grelhado',
+        guarnicao: 'Batata Doce Assada',
+        salada: 'Alface, Tomate, Cenoura',
+        sobremesa: 'Banana',
+        suco: 'Laranja'
+      },
+      jantar: {
+        principal: 'Sopa de Legumes com Frango',
+        guarnicao: 'Torrada Integral',
+        salada: 'Salada de Repolho',
+        sobremesa: 'Maçã',
+        suco: 'Uva'
+      }
+    },
+    quinta: {
+      almoco: {
+        principal: 'Arroz Integral, Feijão Preto, Carne de Panela',
+        guarnicao: 'Purê de Mandioquinha',
+        salada: 'Mix de Folhas Verdes',
+        sobremesa: 'Gelatina de Frutas',
+        suco: 'Abacaxi'
+      },
+      jantar: {
+        principal: 'Macarrão Integral ao Sugo',
+        guarnicao: 'Legumes Grelhados',
+        salada: 'Rúcula e Tomate Cereja',
+        sobremesa: 'Pera',
+        suco: 'Maracujá'
+      }
+    },
+    sexta: {
+      almoco: {
+        principal: 'Arroz, Feijão Carioca, Carne Assada',
+        guarnicao: 'Farofa de Banana',
+        salada: 'Alface Americana, Beterraba',
+        sobremesa: 'Doce de Abóbora',
+        suco: 'Acerola'
+      },
+      jantar: {
+        principal: 'Caldo Verde com Calabresa',
+        guarnicao: 'Pão de Alho Integral',
+        salada: 'Salada Caesar Simplificada',
+        sobremesa: 'Manga',
+        suco: 'Goiaba'
+      }
+    },
   };
 
   const diaAtual = cardapioSemanal[diaSelecionado];
+  const ehDiaAtual = diaHoje !== null && diaSelecionado === diaHoje;
+  const podeAvaliar = ehDiaAtual && passouCarteirinhaHoje;
 
-  // Função para formatar a data como DD/MM
+  useEffect(() => {
+    if (!user?.codUsuarioCPF) {
+      setPassouCarteirinhaHoje(false);
+      setCarregandoPassagem(false);
+      return undefined;
+    }
+
+    let cancelado = false;
+    setCarregandoPassagem(true);
+
+    consultarPassagemCarteirinhaHoje(user.codUsuarioCPF)
+      .then((passou) => {
+        if (!cancelado) setPassouCarteirinhaHoje(passou);
+      })
+      .finally(() => {
+        if (!cancelado) setCarregandoPassagem(false);
+      });
+
+    return () => {
+      cancelado = true;
+    };
+  }, [user?.codUsuarioCPF]);
+
   const formatarData = (offset) => {
-    const data = new Date();
-    // Encontra a segunda-feira da semana atual
-    const diaDaSemana = data.getDay(); // 0 (Dom) a 6 (Sáb)
-    const diferencaParaSegunda = data.getDate() - diaDaSemana + (diaDaSemana === 0 ? -6 : 1);
-    
-    const novaData = new Date(data.setDate(diferencaParaSegunda + offset));
-    return novaData.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const hoje = new Date();
+    const diaDaSemana = hoje.getDay();
+    const diferencaParaSegunda = hoje.getDate() - diaDaSemana + (diaDaSemana === 0 ? -6 : 1);
+    const segunda = new Date(hoje.getFullYear(), hoje.getMonth(), diferencaParaSegunda);
+    const alvo = new Date(segunda);
+    alvo.setDate(segunda.getDate() + offset);
+    return alvo.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   };
 
   const dias = [
@@ -107,7 +192,9 @@ const CardapioPage = () => {
               key={dia.key}
               onClick={() => {
                 setDiaSelecionado(dia.key);
-                setFeedbackEnviado(false); // Reseta o feedback ao mudar de dia
+                setFeedbackEnviado(false);
+                setNota(0);
+                setComentario('');
               }}
               className={`flex-shrink-0 px-4 py-3 rounded-xl font-semibold transition-all ${
                 diaSelecionado === dia.key
@@ -158,8 +245,24 @@ const CardapioPage = () => {
         <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500">
           <h2 className="text-xl font-bold text-blue-900 mb-2">⭐ Avaliar Refeição</h2>
           <p className="text-gray-500 text-sm mb-4">A sua opinião ajuda a nutricionista a melhorar o nosso menu!</p>
-          
-          {feedbackEnviado ? (
+
+          {carregandoPassagem ? (
+            <div className="bg-gray-50 text-gray-600 p-4 rounded-xl text-center text-sm border border-gray-200">
+              Verificando passagem da carteirinha...
+            </div>
+          ) : diaHoje === null ? (
+            <div className="bg-amber-50 text-amber-800 p-4 rounded-xl text-sm border border-amber-200">
+              A avaliação só está disponível em dias úteis, quando há cardápio do dia.
+            </div>
+          ) : !ehDiaAtual ? (
+            <div className="bg-amber-50 text-amber-800 p-4 rounded-xl text-sm border border-amber-200">
+              Selecione o cardápio de hoje para poder avaliar a refeição.
+            </div>
+          ) : !passouCarteirinhaHoje ? (
+            <div className="bg-amber-50 text-amber-800 p-4 rounded-xl text-sm border border-amber-200">
+              Você só pode avaliar depois de passar a carteirinha no refeitório hoje.
+            </div>
+          ) : feedbackEnviado ? (
             <div className="bg-green-50 text-green-700 p-4 rounded-xl text-center font-bold border border-green-200 animate-pulse">
               ✅ Muito obrigada! A sua avaliação foi enviada para a equipe de nutrição.
             </div>

@@ -3,10 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CardapioPreview from './CardapioPreview';
 import { useAuth, PAPEL_NUTRICIONISTA } from '../context/AuthContext.jsx';
 
-/** Atalho de desenvolvimento: mesmo CPF do usuário nutricionista seed no banco. */
 function resolveIdentificador(raw) {
-  const trimmed = raw.trim().toLowerCase();
-  if (trimmed === 'nutri') return '11111111111';
   return raw.replace(/\D/g, '');
 }
 
@@ -40,7 +37,7 @@ const LoginPage = () => {
 
     const codUsuarioCPF = resolveIdentificador(matricula);
     if (codUsuarioCPF.length !== 11) {
-      setError('Informe um CPF com 11 dígitos (ou use o atalho nutri + senha do ambiente de demo).');
+      setError('Informe um CPF com 11 dígitos.');
       return;
     }
 
@@ -70,6 +67,12 @@ const LoginPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleMatriculaChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+    setMatricula(digits);
+    setError('');
   };
 
   return (
@@ -124,16 +127,18 @@ const LoginPage = () => {
               </p>
               <form onSubmit={handleSubmit} className="space-y-5 max-w-md mx-auto" noValidate>
                 <div>
-                  <label htmlFor="matricula" className="block text-base font-semibold text-gray-800 mb-2">CPF ou atalho &quot;nutri&quot;</label>
+                  <label htmlFor="matricula" className="block text-base font-semibold text-gray-800 mb-2">CPF</label>
                   <div className="relative">
                     <span className="absolute left-3 top-3.5 text-gray-600">👤</span>
                     <input
                       id="matricula"
                       type="text"
+                      inputMode="numeric"
+                      maxLength={11}
                       className="w-full pl-10 pr-4 py-3.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-800 outline-none bg-gray-50 text-gray-900"
-                      placeholder="CPF (11 dígitos) ou digite nutri"
+                      placeholder="00000000000"
                       value={matricula}
-                      onChange={(e) => { setMatricula(e.target.value); setError(''); }}
+                      onChange={handleMatriculaChange}
                       disabled={isLoading || isBloqueado}
                       autoComplete="username"
                     />

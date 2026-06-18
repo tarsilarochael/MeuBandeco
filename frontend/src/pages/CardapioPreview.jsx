@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 
+const CAMPUS_OPCOES = [
+  { value: 'campus-i', label: 'Campus I - Nova Suíça' },
+  { value: 'campus-ii', label: 'Campus II - Nova Gameleira' },
+  { value: 'campus-contagem', label: 'Campus Contagem' },
+];
+
 const CardapioPreview = () => {
+  const [campus, setCampus] = useState('campus-i');
   const [diaSelecionado, setDiaSelecionado] = useState('hoje');
   const [refeicaoExpandida, setRefeicaoExpandida] = useState(null);
+
+  const campusLabel = CAMPUS_OPCOES.find((c) => c.value === campus)?.label ?? '';
 
   // Cardápio semanal completo
   const cardapioSemanal = {
@@ -79,6 +88,27 @@ const CardapioPreview = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+        <label htmlFor="campus-select" className="text-sm font-semibold text-gray-800">
+          Campus
+        </label>
+        <select
+          id="campus-select"
+          value={campus}
+          onChange={(e) => {
+            setCampus(e.target.value);
+            setRefeicaoExpandida(null);
+          }}
+          className="w-full sm:w-auto bg-white border-2 border-gray-300 text-gray-800 py-2.5 px-4 rounded-lg focus:ring-2 focus:ring-blue-800 outline-none text-sm font-medium"
+        >
+          {CAMPUS_OPCOES.map((opcao) => (
+            <option key={opcao.value} value={opcao.value}>
+              {opcao.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Seletor de Dias */}
       <div className="flex gap-2 mb-6">
         {diasSemana.map((dia) => (
@@ -103,10 +133,11 @@ const CardapioPreview = () => {
       {diaAtual && (
         <div className="space-y-4">
           {/* Data do Dia */}
-          <div className="text-center mb-4">
+          <div className="text-center mb-4 space-y-2">
             <span className="inline-block bg-blue-50 text-blue-900 px-4 py-2 rounded-full text-sm font-semibold">
               {diaAtual.data}
             </span>
+            <p className="text-sm text-gray-600">{campusLabel}</p>
           </div>
 
           {/* Refeições em Accordion */}
